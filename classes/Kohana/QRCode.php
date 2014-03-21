@@ -227,12 +227,13 @@ abstract class Kohana_QRCode {
 	 * @params   integer  Size (Default 5)
 	 * @params   integer  Margin (Default 2)
 	 * @params   boolean  Save and display (Default false)
+	 * @params   integer  A value between 0 and 127. 0 indicates completely opaque while 127 indicates completely transparent.
 	 * @return   string
 	 */
-  public static function png($text, $outfile = FALSE, $level = QRConst::QR_ECLEVEL_H, $size = 5, $margin = 2, $saveandprint=false) 
+  public static function png($text, $outfile = FALSE, $level = QRConst::QR_ECLEVEL_H, $size = 5, $margin = 2, $saveandprint=false, $alpha = 0)
   {
       $enc = QRencode::factory($level, $size, $margin);
-      return $enc->encodePNG($text, $outfile, $saveandprint);
+      return $enc->encodePNG($text, $outfile, $saveandprint, $alpha);
   }
 
 
@@ -987,9 +988,9 @@ class QRspec {
 class QRimage {
 
   //----------------------------------------------------------------------
-  public static function png($frame, $filename = FALSE, $pixelPerPoint = 4, $outerFrame = 4,$saveandprint=FALSE) 
+  public static function png($frame, $filename = FALSE, $pixelPerPoint = 4, $outerFrame = 4,$saveandprint=FALSE, $alpha = 0)
   {
-      $image = self::image($frame, $pixelPerPoint, $outerFrame);
+      $image = self::image($frame, $pixelPerPoint, $outerFrame, $alpha);
 
       if ($filename === FALSE)
       {
@@ -1014,7 +1015,7 @@ class QRimage {
 
 
   //----------------------------------------------------------------------
-  private static function image($frame, $pixelPerPoint = 4, $outerFrame = 4) 
+  private static function image($frame, $pixelPerPoint = 4, $outerFrame = 4, $alpha = 0)
   {
       $min = strlen($frame[0]);
       foreach ($frame as $str) {
@@ -1027,8 +1028,8 @@ class QRimage {
       $imgH = $h + 2 * $outerFrame;
 
       $base_image =ImageCreate($imgW, $imgH);
-      $col[0] = ImageColorAllocateAlpha($base_image,255,255,255,127);
 
+      $col[0] = ImageColorAllocateAlpha($base_image,255,255,255,$alpha);
       $col[1] = ImageColorAllocate($base_image,0,0,0);
 
       imagefill($base_image, 0, 0, $col[0]);
@@ -3139,7 +3140,7 @@ class QRencode {
   }
 
   //----------------------------------------------------------------------
-  public function encodePNG($intext, $outfile = false, $saveandprint = false) 
+  public function encodePNG($intext, $outfile = false, $saveandprint = false, $alpha = 0)
   {
     try {
       ob_start();
@@ -3151,8 +3152,8 @@ class QRencode {
         throw new Kohana_Exception($err);
 
       $maxSize = (int)(Kohana::$config->load('qrcode')->png_max_size / (count($tab) + 2 * $this->margin));
-      QRimage::png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin,$saveandprint);
 
+      QRimage::png($tab, $outfile, min(max(1, $this->size), $maxSize), $this->margin, $saveandprint, $alpha);
 
     } catch (Exception $e) {
       Kohana_exception::handler($e);

@@ -16,6 +16,15 @@ Usage
     $this->response->body(QRCode::instance()->png('http://kohanaframework.org/')); 
 
 
+### Display a transparent QRCode
+
+    // Force content type
+    $this->response->headers('Content-Type','image/png');
+
+    // Show QRcode
+    $this->response->body(QRCode::instance()->png('http://kohanaframework.org/', FALSE, QRConst::QR_ECLEVEL_H, 5, 2, FALSE, 127));
+
+
 ### Save a QRCode as file
 
     // Save as qrcode.png
