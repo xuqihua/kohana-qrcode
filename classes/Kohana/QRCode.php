@@ -232,7 +232,7 @@ abstract class Kohana_QRCode {
   public static function png($text, $outfile = FALSE, $level = QRConst::QR_ECLEVEL_H, $size = 5, $margin = 2, $saveandprint=false) 
   {
       $enc = QRencode::factory($level, $size, $margin);
-      return $enc->encodePNG($text, $outfile, $saveandprint=false);
+      return $enc->encodePNG($text, $outfile, $saveandprint);
   }
 
 
